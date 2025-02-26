@@ -1,0 +1,19 @@
+input {
+  udp {
+    port => 514
+    type => "syslog"
+  }
+}
+
+filter {
+  grok {
+    match => { "message" => "^<%{POSINT:syslog_facility}>%{SYSLOGTIMESTAMP:timestamp} %{IPORHOST:host} %{DATA:program}: %{GREEDYDATA:syslog_message}" }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    index => "cisco-logs-%{+YYYY.MM.dd}"
+  }
+}
